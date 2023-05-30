@@ -1,0 +1,40 @@
+{
+    "@id": "dtmi:digitaltwin:store;1",
+    "@type": "Interface",
+    "@context": "dtmi:dtdl:context;2",
+    "displayName": "Store",
+    "contents": [
+        {
+            "@type": "Telemetry",
+            "name": "Temperature",
+            "schema": "double"
+         },
+        {
+            "@type": "Relationship",
+            "name": "contains",
+            "displayName": "contains",
+             "target": "dtmi:digitaltwins:cashier;1"
+         },
+         {
+             "@type": "Relationship",
+             "@id": "dtmi:digitaltwins:store:rel_has_shelves;1",
+             "name": "rel_has_shelves",
+             "displayName": "Store has shelves",
+              "target": "dtmi:digitaltwins:shelves;1"
+          },
+          {
+            "@type": "Relationship",
+            "@id": "dtmi:digitaltwins:store:rel_has_vendo;1",
+            "name": "rel_has_vendo",
+            "displayName": "Store has vendo",
+             "target": "dtmi:digitaltwins:vendo;1"
+         },
+         {
+            "@type": "Relationship",
+            "@id": "dtmi:digitaltwins:store:rel_has_refrigerator;1" ,
+            "name": "rel_has_refrigerator",
+            "displayName": "Store has refrigerator",
+             "target": "dtmi:digitaltwins:refrigerator;1"
+         }
+    ]
+}

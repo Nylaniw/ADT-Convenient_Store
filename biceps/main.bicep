@@ -1,9 +1,9 @@
 @description('Specifies the location for resources.')
-param location string = 'westcentralus'
+param location string = resourceGroup().location
 
 
 // AZURE DIGITAL TWINS
-param digitalTwinsName string = 'adt-convenient-store'
+param digitalTwinsName string = 'adt-con-store'
 
 resource digitalTwins 'Microsoft.DigitalTwins/digitalTwinsInstances@2022-10-31' = {
   name: digitalTwinsName
@@ -11,7 +11,7 @@ resource digitalTwins 'Microsoft.DigitalTwins/digitalTwinsInstances@2022-10-31' 
 }
 
 // STORAGE ACCOUNT FOR AZURE DIGITAL TWINS 3D SCENES
-param storageAccountName string = 'ADTConvenientStoreStorageAccount'
+param storageAccountName string = 'adtcstorestorageaccount'
 
 @allowed([
   'Premium_LRS'
@@ -34,7 +34,7 @@ param sku string = 'Standard_RAGRS'
 ])
 param kind string = 'StorageV2'
 
-param containerName string = 'convenientstoredigitaltwinscontainer'
+param containerName string = 'constoredigitaltwinscontainer'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   name: toLower(storageAccountName)
@@ -74,38 +74,38 @@ resource storageAccountContainer 'Microsoft.Storage/storageAccounts/blobServices
   parent: storageAccountBlobService
 }
 
-// ROLE ASSIGNMENTS FOR ADT AND SA
-param principalId string
+// // ROLE ASSIGNMENTS FOR ADT AND SA
+// param principalId string
 
-@allowed([
-  'Device'
-  'ForeignGroup'
-  'Group'
-  'ServicePrincipal'
-  'User'
-])
-param principalType string = 'Group'
+// @allowed([
+//   'Device'
+//   'ForeignGroup'
+//   'Group'
+//   'ServicePrincipal'
+//   'User'
+// ])
+// param principalType string = 'Group'
 
-var azureDigitalTwinsDataOwnerRoleDefinitionId = 'bcd981a7-7f74-457b-83e1-cceb9e632ffe'
+// var azureDigitalTwinsDataOwnerRoleDefinitionId = 'bcd981a7-7f74-457b-83e1-cceb9e632ffe'
 
-resource roleAssignmentDigitalTwins 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, principalId, azureDigitalTwinsDataOwnerRoleDefinitionId)
-  scope: digitalTwins
-  properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', azureDigitalTwinsDataOwnerRoleDefinitionId)
-    principalId: principalId
-    principalType: principalType
-  }
-}
+// resource roleAssignmentDigitalTwins 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(resourceGroup().id, principalId, azureDigitalTwinsDataOwnerRoleDefinitionId)
+//   scope: digitalTwins
+//   properties: {
+//     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', azureDigitalTwinsDataOwnerRoleDefinitionId)
+//     principalId: principalId
+//     principalType: principalType
+//   }
+// }
 
-var storageBlobDataOwnerRoleDefinitionId = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
+// var storageBlobDataOwnerRoleDefinitionId = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
 
-resource roleAssignmentStorageAccount 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, principalId, storageBlobDataOwnerRoleDefinitionId)
-  scope: storageAccount
-  properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataOwnerRoleDefinitionId)
-    principalId: principalId
-    principalType: principalType
-  }
-}
+// resource roleAssignmentStorageAccount 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(resourceGroup().id, principalId, storageBlobDataOwnerRoleDefinitionId)
+//   scope: storageAccount
+//   properties: {
+//     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataOwnerRoleDefinitionId)
+//     principalId: principalId
+//     principalType: principalType
+//   }
+// }
