@@ -1,18 +1,7 @@
+param laManageIdentityName string = 'ADTPodTestingMI'
 @description('Specifies the location for resources.')
-param location string = resourceGroup().location
-
-
-// AZURE DIGITAL TWINS
-param digitalTwinsName string = 'adt-con-store'
-
-resource digitalTwins 'Microsoft.DigitalTwins/digitalTwinsInstances@2022-10-31' = {
-  name: digitalTwinsName
-  location: location
-}
-
-// STORAGE ACCOUNT FOR AZURE DIGITAL TWINS 3D SCENES
-param storageAccountName string = 'adtcstorestorageaccount'
-
+param location string = 'southeastasia'
+param storageAccountName string = 'adtpodstorageaccount'
 @allowed([
   'Premium_LRS'
   'Premium_ZRS'
@@ -24,7 +13,6 @@ param storageAccountName string = 'adtcstorestorageaccount'
   'Standard_ZRS'
 ])
 param sku string = 'Standard_RAGRS'
-
 @allowed([
   'BlobStorage'
   'BlockBlobStorage'
@@ -33,9 +21,25 @@ param sku string = 'Standard_RAGRS'
   'StorageV2'
 ])
 param kind string = 'StorageV2'
-
-param containerName string = 'constoredigitaltwinscontainer'
-
+param containerName string = 'adtconvenientstorecontainer'
+param digitalTwinsName string = 'ConvenientStoreDigitalTwins'
+param project string = 'digitaltwins'
+param by string = 'winalyn'
+// RESOURCES
+resource LAManageIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+  name: laManageIdentityName
+  location: location
+}
+resource digitalTwins 'Microsoft.DigitalTwins/digitalTwinsInstances@2022-10-31' = {
+  name: digitalTwinsName
+  location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${LAManageIdentity.id}' : {}
+    }
+  }
+}
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   name: toLower(storageAccountName)
   location: location
@@ -44,7 +48,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
     name: sku
   }
 }
-
 resource storageAccountBlobService 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
   name: 'default'
   parent: storageAccount
@@ -68,44 +71,38 @@ resource storageAccountBlobService 'Microsoft.Storage/storageAccounts/blobServic
     }
   }
 }
-
 resource storageAccountContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
   name: containerName
   parent: storageAccountBlobService
 }
-
-// // ROLE ASSIGNMENTS FOR ADT AND SA
-// param principalId string
-
-// @allowed([
-//   'Device'
-//   'ForeignGroup'
-//   'Group'
-//   'ServicePrincipal'
-//   'User'
-// ])
-// param principalType string = 'Group'
-
-// var azureDigitalTwinsDataOwnerRoleDefinitionId = 'bcd981a7-7f74-457b-83e1-cceb9e632ffe'
-
-// resource roleAssignmentDigitalTwins 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid(resourceGroup().id, principalId, azureDigitalTwinsDataOwnerRoleDefinitionId)
-//   scope: digitalTwins
-//   properties: {
-//     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', azureDigitalTwinsDataOwnerRoleDefinitionId)
-//     principalId: principalId
-//     principalType: principalType
-//   }
-// }
-
-// var storageBlobDataOwnerRoleDefinitionId = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
-
-// resource roleAssignmentStorageAccount 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid(resourceGroup().id, principalId, storageBlobDataOwnerRoleDefinitionId)
-//   scope: storageAccount
-//   properties: {
-//     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataOwnerRoleDefinitionId)
-//     principalId: principalId
-//     principalType: principalType
-//   }
-// }
+// RESOURCE TAGS
+resource LAManageIdentityTags 'Microsoft.Resources/tags@2022-09-01' = {
+  name:  'default'
+  scope: LAManageIdentity
+  properties: {
+    tags: {
+      project: project
+      by: 'jerrico,winalyn'
+    }
+  }
+}
+resource storageAccountTags 'Microsoft.Resources/tags@2022-09-01' = {
+  name:  'default'
+  scope: storageAccount
+  properties: {
+    tags: {
+      project: project
+      by: 'jerrico,winalyn'
+    }
+  }
+}
+resource digitalTwinsTags 'Microsoft.Resources/tags@2022-09-01' = {
+  name:  'default'
+  scope: digitalTwins
+  properties: {
+    tags: {
+      project: project
+      by: by
+    }
+  }
+}
