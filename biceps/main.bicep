@@ -1,7 +1,7 @@
 param laManageIdentityName string = 'ADTPodTestingMI'
 @description('Specifies the location for resources.')
 param location string = 'southeastasia'
-param storageAccountName string = 'adtpodstorageaccount'
+param storageAccountName string = 'adtpocstorageaccount'
 @allowed([
   'Premium_LRS'
   'Premium_ZRS'
